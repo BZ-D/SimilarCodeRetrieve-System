@@ -1,0 +1,51 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /api
+spring:
+  application:
+    name: similar-code-retrieval-api
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.29.7.168:32306/similar_code_retrieval?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: rootpassword
+    hikari:
+      connection-timeout: 60000
+      maximum-pool-size: 12
+      minimum-idle: 10
+      idle-timeout: 500000
+      max-lifetime: 540000
+      connection-test-query: SELECT 1
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+code-retrieve:
+  algorithm: levenshtein-distance
+
+obs:
+  bucket-name: similar-code-retrieve
+  endpoint: obs.cn-southwest-2.myhuaweicloud.com
+  ak: RZCQIDKJTZV4IXCPVTIO
+  sk: qPMPGo5jZa57zZVgTGvyytDEJDRsXZJ2PpI6x6H1
+
+ceph:
+  s3:
+    endpoint: http://172.19.241.52:7480
+    accessKey: test1
+    secretKey: 0DVG2lSU04j6ZEK3qiVAxTCn60rzm7HZPDOeF9NO
+
+es:
+  host: 172.19.241.178
+  port: 9200
+  protocol: http

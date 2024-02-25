@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.src.srcapi.dao.CommitRecordMapper">
+
+    <resultMap id="CommitStatisticMap" type="com.src.srcapi.model.dto.commitRecord.CommitStatisticDTO" >
+        <result column="date" property="date" />
+        <result column="commitsCount" property="commitsCount" />
+        <result column="affectFilesCount" property="affectFilesCount" />
+        <result column="addLinesCount" property="addLinesCount" />
+        <result column="minusLinesCount" property="minusLinesCount" />
+    </resultMap>
+
+    <select id="getCodeRepoStatistics" resultMap="CommitStatisticMap">
+        select a.date as date,ifnull(b.commitsCount,0) as commitsCount, ifnull(b.affectFilesCount,0) as affectFilesCount,
+            ifnull(b.addLinesCount,0) as addLinesCount, ifnull(b.minusLinesCount,0) as minusLinesCount
+        from (
+                 SELECT curdate() as date
+                 union all
+                 SELECT date_sub(curdate(), interval 1 day) as date
+                 union all
+                 SELECT date_sub(curdate(), interval 2 day) as date
+                 union all
+                 SELECT date_sub(curdate(), interval 3 day) as date
+                 union all
+                 SELECT date_sub(curdate(), interval 4 day) as date
+                 union all
+                 SELECT date_sub(curdate(), interval 5 day) as date
+                 union all
+                 SELECT date_sub(curdate(), interval 6 day) as date
+             ) a left join (
+            SELECT
+                DATE_FORMAT(create_time,"%Y-%m-%d") as create_time,
+                COUNT(1) as commitsCount,
+                SUM(affect_files_count) as affectFilesCount,
+                SUM(add_lines_count) as addLinesCount,
+                SUM(minus_lines_count) as minusLinesCount
+            FROM commit_record
+            where create_time>=DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+            <if test="repoId!=0">
+                and repo_id=#{repoId}
+            </if>
+            GROUP BY DATE_FORMAT(create_time,"%Y-%m-%d")
+            ORDER BY DATE_FORMAT(create_time,"%Y-%m-%d") DESC
+        ) b on a.date = b.create_time ORDER BY a.date asc
+    </select>
+</mapper>
